@@ -1,66 +1,79 @@
 package main
 
-import "encoding/json"
-import "net/http"
-import "fmt"
-
-type Result struct{
-	Status Status `json:"status"`
-	Data Data `json:"data"`
-}
+import (
+	"encoding/json"
+	"github.com/PuerkitoBio/goquery"
+	"log"
+	"net/http"
+	// "fmt"
+)
 
 type Status struct{
 	Code string `json:"code"`
 	Message string `json:"message"`
 }
 
-type Data struct{
-	ReceivedBy string `json:"receivedBy"`
-	Histories Histories `json:"histories"`
+
+type Data struct {
+	Nama string `json:"ReceivedBy"`
 }
 
-type Histories struct{
-	Description string `json:"description"`
-	CreatedAt string `json: "createdAt"`
-	Formatted Formatted `json : "formatted"`
+type History struct{
+	Title string `json:"histories"`
+	// URL string
+	// Category string
 }
 
-type Formatted struct {
-	CreatedAt string `json: "createdAt"`
+type Result struct {
+	Status Status
+	Data Data
+	History History
 }
 
+func main(){
+	res, err := http.Get("https://gist.githubusercontent.com/nubors/eecf5b8dc838d4e6cc9de9f7b5db236f/raw/d34e1823906d3ab36ccc2e687fcafedf3eacfac9/jne-awb.html")
+	
+	if err != nil {
+		log.Fatal(err)
+	}
 
-var status = Status{Code : "060101", Message: "Delivery tracking detail fetched successfully"}
+	defer res.Body.Close()
 
-var formatted = Formatted{CreatedAt : "04 Februari 2021, 10:22 WIB"}
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s",res.StatusCode, res.Status)
+	}
 
-var histories = Histories{Description : "DELIVERED TO [PAK MURADI  | 04-02-2021 10:22 | BEKASI ]", CreatedAt: "2021-02-04T10:22:00+07:00", Formatted : formatted }
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-var data = Data{ReceivedBy: "PAK MURADI", Histories:histories }
+	rows := make([]History, 0)
 
-var results = Result{Status: status, Data: data}
+	doc.Find("table tbody tr").Each(func(i int, sel *goquery.Selection){
+			row := new(History)
+			row.Title = sel.Find("td").Text()
 
-func users(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
+			rows = append(rows, *row)
+			// log.Println(code)
+	})
 
-    if r.Method == "GET" {
-        var result, err = json.Marshal(results)
 
-        if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
 
-        w.Write(result)
-        return
-    }
+	var status = Status{Code : "060101", Message: "Delivery tracking detail fetched successfully"}
 
-    http.Error(w, "", http.StatusBadRequest)
-}
+	var nama = Data{Nama: "Pak Muradi"}
 
-func main() {
-    http.HandleFunc("/users", users)
+	bts, err := json.MarshalIndent(a, ""," ")
+	if err != nil{
+		log.Fatal(err)
+	}
 
-    fmt.Println("starting web server at http://localhost:8181/")
-    http.ListenAndServe(":8181", nil)
+	bts2, err := json.MarshalIndent(rows, ""," ")
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	log.Print(string(bts),string(bts2))
+
 }

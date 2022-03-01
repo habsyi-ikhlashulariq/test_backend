@@ -27,7 +27,6 @@ type History struct{
 type Result struct {
 	Status Status
 	Data Data
-	History History
 }
 
 func main(){
@@ -63,8 +62,9 @@ func main(){
 	var status = Status{Code : "060101", Message: "Delivery tracking detail fetched successfully"}
 
 	var nama = Data{Nama: "Pak Muradi"}
+	var result = Result{status, nama}
 
-	bts, err := json.MarshalIndent(a, ""," ")
+	bts, err := json.MarshalIndent(result, ""," ")
 	if err != nil{
 		log.Fatal(err)
 	}

@@ -73,105 +73,9 @@
 
 // echo json_encode($result);
 
-// $html_string = '
-//     <p class="Heading1-P">
-//         <span class="Heading1-H">Chapter 1</span>
-//     </p>
-//     <p class="Normal-P">
-//         <span class="Normal-H">This is chapter 1</span>
-//     </p>
-//     <p class="Heading1-P">
-//         <span class="Heading1-H">Chapter 2</span>
-//     </p>
-//     <p class="Normal-P">
-//         <span class="Normal-H">This is chapter 2</span>
-//     </p>
-//     <p class="Heading1-P">
-//         <span class="Heading1-H">Chapter 3</span>
-//     </p>
-//     <p class="Normal-P">
-//         <span class="Normal-H">This is chapter 3</span>
-//     </p>';
-// $html = str_get_html($html_string);
-// foreach($html->find('span') as $element) {
-//     if ($element->class === 'Heading1-H') {
-//         $heading[] = $element->innertext;
-//     }else if($element->class === 'Normal-H') {
-//         $content[] = $element->innertext;
-//     }
-// }
 
-
-// $dom = new DomDocument();
-// $test='<p class="Heading1-P">
-//     <span class="Heading1-H">Chapter 1</span>
-// </p>
-// <p class="Normal-P">
-//     <span class="Normal-H">This is chapter 1</span>
-// </p>
-// <p class="Heading1-P">
-//     <span class="Heading1-H">Chapter 2</span>
-// </p>
-// <p class="Normal-P">
-//     <span class="Normal-H">This is chapter 2</span>
-// </p>
-// <p class="Heading1-P">
-//     <span class="Heading1-H">Chapter 3</span>
-// </p>
-// <p class="Normal-P">
-//     <span class="Normal-H">This is chapter 3</span>
-// </p>';
-
-// $dom->loadHTML($test);
-// $xpath = new DOMXpath($dom);
-// $heading=parseToArray($xpath,'Heading1-H');
-// $content=parseToArray($xpath,'Normal-H');
-
-// var_dump($heading);
-// echo "<br/>";
-// var_dump($content);
-// echo "<br/>";
-
-// function parseToArray($xpath,$class)
-// {
-// 	$xpathquery="//span[@class='".$class."']";
-// 	$elements = $xpath->query($xpathquery);
-
-// 	if (!is_null($elements)) {	
-// 		$resultarray=array();
-// 		foreach ($elements as $element) {
-// 		    $nodes = $element->childNodes;
-// 		    foreach ($nodes as $node) {
-// 		      $resultarray[] = $node->nodeValue;
-// 		    }
-// 		}
-// 		return $resultarray;
-// 	}
-// }
-
-
-// $file = file_get_contents("https://gist.githubusercontent.com/nubors/eecf5b8dc838d4e6cc9de9f7b5db236f/raw/d34e1823906d3ab36ccc2e687fcafedf3eacfac9/jne-awb.html");
-
-// echo $file;
-
-// $dom = new domDocument;
-
-// @$dom->loadHTML($file);
-
-// $scrape = $dom->getElementsByTagName('td');
-// // $scrape = $dom->document.getElementsByClassName('.table_style')[0];
-
-// foreach ($scrape as $title) {
-//     // $data[] =  $title->nodeValue;
-//     echo json_encode($title->nodeValue);
-// }
-
-// echo json_encode($result);
-
-// In case the File is in the API directory
 include('simple_html_dom.php');
 
-// Extracting DOM
 $html = file_get_html(
 'https://gist.githubusercontent.com/nubors/eecf5b8dc838d4e6cc9de9f7b5db236f/raw/d34e1823906d3ab36ccc2e687fcafedf3eacfac9/jne-awb.html');
 
@@ -179,19 +83,22 @@ $html = file_get_html(
 
 foreach($html->find('div.main-content') as $article) {
     $item = array();
-    // // $caption = $article->find('td.seller-name div.seller-info span.seller-info-caption', 0);
-    // // $mw = $article->find('td.offer-price span.variant-final-price span.m-w', 0);
-    // if ($caption && $mw) {
-    //     $item['name'] = $caption->plaintext;
-    //     $item['price'] = $mw->plaintext;
-    //     $articles[] = $item;
-    // }
+
     $isi = $article->find('table.table_style ', 2);
     if($isi){
         $item['isi'] = $isi->plaintext;
+
         $articles[] = [
-            "history"=>$item
+            "Status" =>[
+                "code" => "060101",
+                "message" => "Delivery tracking detail fetched successfully"
+            ],
+            "Data" =>[
+                "receivedBy" => "PAK MURADI",
+                "history"=>$item
+            ]
         ];
+            
     }
     print_r($articles);
 
